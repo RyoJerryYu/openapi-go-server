@@ -42,5 +42,5 @@ type {{classname}}Servicer interface { {{#operations}}{{#operation}}
 	{{#isDeprecated}}
 	// Deprecated
 	{{/isDeprecated}}
-	{{operationId}}(context.Context{{#allParams}}, {{dataType}}{{/allParams}}) (ImplResponse, error){{/operation}}{{/operations}}
+	{{operationId}}(context.Context{{#allParams}}, {{dataType}}{{/allParams}}) ({{#returnType}}{{returnType}}, {{/returnType}}error){{/operation}}{{/operations}}
 }{{/apis}}{{/apiInfo}}
