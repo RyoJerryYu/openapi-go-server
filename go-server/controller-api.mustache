@@ -246,7 +246,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	// }
 	{{#returnType}}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result, &result.Code,{{#addResponseHeaders}} result.Headers,{{/addResponseHeaders}} w)
+	EncodeJSONResponse(result, nil,{{#addResponseHeaders}} result.Headers,{{/addResponseHeaders}} w)
 	{{/returnType}}
 
 }{{/operation}}{{/operations}}
