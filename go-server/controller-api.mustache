@@ -228,7 +228,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{/allParams}}
 	{{#returnType}}var result {{returnType}}{{/returnType}}
 	var serviceErr error
-	{{#returnType}}result, {{/returnType}}serviceErr = c.service.{{nickname}}(r.Context(){{#allParams}}, {{#isBodyParam}}*{{/isBodyParam}}{{paramName}}Param{{/allParams}})
+	{{#returnType}}result, {{/returnType}}serviceErr = c.service.{{nickname}}(r.Context(){{#allParams}}, {{paramName}}Param{{/allParams}})
 	if serviceErr != nil {
 		var ae *Error
 		if errors.As(serviceErr, &ae) {
