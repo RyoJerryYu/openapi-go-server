@@ -8,24 +8,27 @@ import (
 	"{{import}}"{{/imports}}
 )
 
-// {{classname}}Service is a service that implements the logic for the {{classname}}Servicer
-// This service should implement the business logic for every endpoint for the {{classname}} API.
-// Include any external packages or services that will be required by this service.
-type {{classname}}Service struct {
+// Mock{{classname}}Service is a mock implement for the interface {{classname}}Servicer
+// This could implement logic by setting each function instance member.
+type Mock{{classname}}Service struct {
+	{{#operations}}{{#operation}}
+	{{#isDeprecated}}
+	// Deprecated
+	{{/isDeprecated}}
+	{{nickname}}Func func(ctx context.Context{{#allParams}}, {{paramName}} {{dataType}}{{/allParams}}) ({{#returnType}}result {{returnType}}, {{/returnType}}err error)
+	{{/operation}}{{/operations}}
 }
 
-// New{{classname}}Service creates a default api service
-func New{{classname}}Service() {{classname}}Servicer {
-	return &{{classname}}Service{}
-}{{#operations}}{{#operation}}
+// NewMock{{classname}}Service creates a default api service
+func NewMock{{classname}}Service() {{classname}}Servicer {
+	return &Mock{{classname}}Service{}
+}
+{{#operations}}{{#operation}}
 
 // {{nickname}} - {{summary}}
 {{#isDeprecated}}
 // Deprecated
 {{/isDeprecated}}
-func (s *{{classname}}Service) {{nickname}}(ctx context.Context{{#allParams}}, {{paramName}} {{dataType}}{{/allParams}}) ({{#returnType}}result {{returnType}}, {{/returnType}}err error) {
-	// TODO - update {{nickname}} with the required logic for this service method.
-	// Add {{classFilename}}_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	return {{#returnType}}result, {{/returnType}}NewError(501, "service method '{{nickname}}' not implemented")
+func (s *Mock{{classname}}Service) {{nickname}}(ctx context.Context{{#allParams}}, {{paramName}} {{dataType}}{{/allParams}}) ({{#returnType}}result {{returnType}}, {{/returnType}}err error) {
+	return s.{{nickname}}Func(ctx{{#allParams}}, {{paramName}}{{/allParams}})
 }{{/operation}}{{/operations}}

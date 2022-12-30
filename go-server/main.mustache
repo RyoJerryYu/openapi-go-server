@@ -11,7 +11,8 @@ import (
 func main() {
 	log.Printf("Server started")
 {{#apiInfo}}{{#apis}}
-	{{classname}}Service := {{packageName}}.New{{classname}}Service()
+	// TODO: implement {{classname}}Service and use your implementation instead of Mock{{classname}}Service
+	{{classname}}Service := {{packageName}}.NewMock{{classname}}Service()
 	{{classname}}Controller := {{packageName}}.New{{classname}}Controller({{classname}}Service)
 {{/apis}}{{/apiInfo}}
 	router := {{packageName}}.NewRouter({{#apiInfo}}{{#apis}}{{classname}}Controller{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}})
