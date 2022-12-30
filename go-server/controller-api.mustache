@@ -229,21 +229,11 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{#returnType}}var result {{returnType}}{{/returnType}}
 	var serviceErr error
 	{{#returnType}}result, {{/returnType}}serviceErr = c.service.{{nickname}}(r.Context(){{#allParams}}, {{paramName}}Param{{/allParams}})
+	// If an error occurred, encode the error with the status code
 	if serviceErr != nil {
-		var ae *httpError
-		if errors.As(serviceErr, &ae) {
-			w.WriteHeader(ae.Code)
-			fmt.Fprint(w, ae.Error())
-		} else {
-			w.WriteHeader(500)
-		}
+		c.errorHandler(w, r, serviceErr)
 		return
 	}
-	// If an error occurred, encode the error with the status code
-	// if err != nil {
-	//	c.errorHandler(w, r, err)
-	//	return
-	// }
 	{{#returnType}}
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result, nil,{{#addResponseHeaders}} result.Headers,{{/addResponseHeaders}} w)
