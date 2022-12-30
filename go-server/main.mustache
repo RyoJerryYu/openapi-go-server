@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	{{packageName}} "{{gitHost}}/{{gitUserId}}/{{gitRepoId}}/{{sourceFolder}}"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -16,6 +17,14 @@ func main() {
 	{{classname}}Controller := {{packageName}}.New{{classname}}Controller({{classname}}Service)
 {{/apis}}{{/apiInfo}}
 	router := {{packageName}}.NewRouter({{#apiInfo}}{{#apis}}{{classname}}Controller{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}})
+
+	const docPath = "/swagger/doc.yaml"
+	router.HandleFunc(docPath, openapigen.DocHandler)
+	router.PathPrefix("/swagger/").Handler(
+		httpSwagger.Handler(
+			httpSwagger.URL(docPath), //The url pointing to API definition
+		),
+	)
 
 	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
 }
