@@ -12,6 +12,30 @@ var (
 	ErrTypeAssertionError = errors.New("unable to assert type")
 )
 
+type HttpError interface {
+	error
+	StatusCode() int
+}
+
+// httpError indicates an error.
+type httpError struct {
+	Code    int
+	Message string
+}
+
+func (e *httpError) Error() string {
+	return e.Message
+}
+
+// NewError returns an http error.
+func NewError(code int, msg string) *httpError {
+	return &httpError{Code: code, Message: msg}
+}
+
+func (e *httpError) StatusCode() int {
+	return e.Code
+}
+
 // ParsingError indicates that an error has occurred when parsing request parameters
 type ParsingError struct {
 	Err error
@@ -25,6 +49,10 @@ func (e *ParsingError) Error() string {
 	return e.Err.Error()
 }
 
+func (e *ParsingError) StatusCode() int {
+	return http.StatusBadRequest
+}
+
 // RequiredError indicates that an error has occurred when parsing request parameters
 type RequiredError struct {
 	Field string
@@ -34,6 +62,10 @@ func (e *RequiredError) Error() string {
 	return fmt.Sprintf("required field '%s' is zero value.", e.Field)
 }
 
+func (e *RequiredError) StatusCode() int {
+	return http.StatusUnprocessableEntity
+}
+
 // ErrorHandler defines the required method for handling error. You may implement it and inject this into a controller if
 // you would like errors to be handled differently from the DefaultErrorHandler
 type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, result *ImplResponse)
@@ -41,12 +73,10 @@ type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, result
 // DefaultErrorHandler defines the default logic on how to handle errors from the controller. Any errors from parsing
 // request params will return a StatusBadRequest. Otherwise, the error code originating from the servicer will be used.
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, result *ImplResponse) {
-	if _, ok := err.(*ParsingError); ok {
-		// Handle parsing errors
-		EncodeJSONResponse(err.Error(), func(i int) *int { return &i }(http.StatusBadRequest),{{#addResponseHeaders}} map[string][]string{},{{/addResponseHeaders}} w)
-	} else if _, ok := err.(*RequiredError); ok {
-		// Handle missing required errors
-		EncodeJSONResponse(err.Error(), func(i int) *int { return &i }(http.StatusUnprocessableEntity),{{#addResponseHeaders}} map[string][]string{},{{/addResponseHeaders}} w)
+	if httpError, ok := err.(HttpError); ok {
+		// Handle all http errors
+		code := httpError.StatusCode()
+		EncodeJSONResponse(err.Error(), &code, w)
 	} else {
 		// Handle all other errors
 		EncodeJSONResponse(err.Error(), &result.Code,{{#addResponseHeaders}} result.Headers,{{/addResponseHeaders}} w)

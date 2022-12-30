@@ -230,7 +230,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	var serviceErr error
 	{{#returnType}}result, {{/returnType}}serviceErr = c.service.{{nickname}}(r.Context(){{#allParams}}, {{paramName}}Param{{/allParams}})
 	if serviceErr != nil {
-		var ae *Error
+		var ae *httpError
 		if errors.As(serviceErr, &ae) {
 			w.WriteHeader(ae.Code)
 			fmt.Fprint(w, ae.Error())

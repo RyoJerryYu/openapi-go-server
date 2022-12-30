@@ -7,21 +7,6 @@ import (
 	"{{import}}"{{/imports}}{{/apis}}{{/apiInfo}}
 )
 
-// Error indicates an error.
-type Error struct {
-	Code    int
-	Message string
-}
-
-func (e *Error) Error() string {
-	return e.Message
-}
-
-// NewError returns an API error.
-func NewError(code int, msg string) *Error {
-	return &Error{Code: code, Message: msg}
-}
-
 {{#apiInfo}}{{#apis}}
 // {{classname}}Router defines the required methods for binding the api requests to a responses for the {{classname}}
 // The {{classname}}Router implementation should parse necessary information from the http request,
