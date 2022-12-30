@@ -5,23 +5,26 @@ import (
 	"log"
 	"net/http"
 
-	// WARNING!
-	// Change this to a fully-qualified import path
-	// once you place this file into your project.
-	// For example,
-	//
-	//    sw "github.com/myname/myrepo/{{sourceFolder}}"
-	//
-	{{packageName}} "./{{sourceFolder}}"
+	{{packageName}} "{{gitHost}}/{{gitUserId}}/{{gitRepoId}}/{{sourceFolder}}"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
 	log.Printf("Server started")
 {{#apiInfo}}{{#apis}}
-	{{classname}}Service := {{packageName}}.New{{classname}}Service()
+	// TODO: implement {{classname}}Service and use your implementation instead of Mock{{classname}}Service
+	{{classname}}Service := &{{packageName}}.Mock{{classname}}Service{}
 	{{classname}}Controller := {{packageName}}.New{{classname}}Controller({{classname}}Service)
 {{/apis}}{{/apiInfo}}
-	router := {{packageName}}.NewRouter({{#apiInfo}}{{#apis}}{{classname}}Controller{{#hasMore}}, {{/hasMore}}{{/apis}}{{/apiInfo}})
+	router := {{packageName}}.NewRouter({{#apiInfo}}{{#apis}}{{classname}}Controller{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}})
+
+	const docPath = "/swagger/doc.yaml"
+	router.HandleFunc(docPath, openapigen.DocHandler)
+	router.PathPrefix("/swagger/").Handler(
+		httpSwagger.Handler(
+			httpSwagger.URL(docPath), //The url pointing to API definition
+		),
+	)
 
 	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
 }

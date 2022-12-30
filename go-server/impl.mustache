@@ -1,0 +1,11 @@
+{{>partial_header}}
+package {{packageName}}
+
+const doc = `
+{{{openapi-yaml}}}
+`
+
+var DocHandler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/yaml")
+	w.Write([]byte(doc))
+}
