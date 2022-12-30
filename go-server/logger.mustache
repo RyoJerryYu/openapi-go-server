@@ -1,19 +1,24 @@
 {{>partial_header}}
 package {{packageName}}
 
-// Logger logs errors that occur during the request flow.
-type Logger interface {
-	Error(args ...interface{})
-}
+import (
+	"log"
+	"net/http"
+	"time"
+)
 
-// NoopLogger implements Logger.
-type NoopLogger struct{}
+func Logger(inner http.Handler, name string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 
-func (n *NoopLogger) Error(args ...interface{}) {}
+		inner.ServeHTTP(w, r)
 
-var apiLog Logger = &NoopLogger{}
-
-// SetLog sets the logger of the package.
-func SetLog(l Logger) {
-	apiLog = l
+		log.Printf(
+			"%s %s %s %s",
+			r.Method,
+			r.RequestURI,
+			name,
+			time.Since(start),
+		)
+	})
 }
