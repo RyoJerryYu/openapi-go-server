@@ -19,10 +19,7 @@ type Mock{{classname}}Service struct {
 	{{/operation}}{{/operations}}
 }
 
-// NewMock{{classname}}Service creates a default api service
-func NewMock{{classname}}Service() {{classname}}Servicer {
-	return &Mock{{classname}}Service{}
-}
+var _ {{classname}}Servicer = (*Mock{{classname}}Service)(nil)
 {{#operations}}{{#operation}}
 
 // {{nickname}} - {{summary}}
